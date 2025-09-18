@@ -4,6 +4,7 @@ import org.slf4j.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,12 @@ public class ProductoController {
 	
 	//SE CREA EL METODO GET
 	@GetMapping("")
-	public String show() {
+	//MODEL PERMITE ENVIAR DATOS DESDE EL BACKEND HACIA LA VISTA
+	public String show(Model model) {
+		
+		//DEVUELVE TODOS LA LISTA DE PRODUCTOS
+		model.addAttribute("productos", productoService.findAll());
+		
 		//SE REDIRECCIONA HACIA LA CARPETA productos Y SE RENDERIZA el archivo show
 		return "productos/show";
 	}
