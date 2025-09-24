@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+//SUBE IMAGENES A LA BASE DE DATOS
 @Service
 public class UploadFileService {
 	private String folder="images//";

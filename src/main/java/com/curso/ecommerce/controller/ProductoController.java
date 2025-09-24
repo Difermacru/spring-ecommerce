@@ -1,5 +1,6 @@
 package com.curso.ecommerce.controller;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import org.slf4j.*;
@@ -11,10 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.model.Usuario;
 import com.curso.ecommerce.service.ProductoService;
+import com.curso.ecommerce.service.UploadFileService;
 
 //4.SE CREA EL ProductoController Y SE IMPLEMENTAN LOS METODOS
 @Controller
@@ -27,6 +31,10 @@ public class ProductoController {
 	
 	@Autowired
 	private ProductoService productoService;
+	
+	@Autowired
+	private UploadFileService upload;
+	
 	
 	//SE CREA EL METODO GET
 	@GetMapping("")
@@ -46,10 +54,11 @@ public class ProductoController {
 		return "productos/create";
 	}
 	
+	
 	//SE CREA EL METODO POST CON SU RUTA
 	@PostMapping("/save")
 	//SE CREA EL METODO SAVE Y SE PASARA UN OBJETO DE CLASE Producto COMO PARAMETRO
-	public String save(Producto producto) {
+	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
 		
 		LOGGER.info("este es el objeto producto {}",producto);
 		//SE CREA UN NUEVO OBJETO DE TIPO USUARIO, ES EL USUARIO QUE SE ASOCIARA AL PRODUCTO
@@ -58,12 +67,21 @@ public class ProductoController {
 		//SE RELACIONA EL producto CON EL Usuario (u), DE ESTA MANERA QUED VINCULADO A UN Usuario 
 		producto.setUsuario(u);
 		
+		//PARA AGREGAR IMAGENES
+		if(producto.getId()==null) { //cuando se crea un producto
+			String nombreImagen= upload.saveImage(file);
+			producto.setImagen(nombreImagen);
+		}else {
+			
+		}
+		
 		//SE LLAMA EL METODO save DE productoService PARA GUARDAR LOS DATOS DEL PRODUCTO JUNTO CON EL USUARIO ASIGNADO 
 		productoService.save(producto);
 		
 		//DESPUES DE GUARDAR EL Producto SE REDIRECCIONA A HACIA LA RUTA productos
 		return "redirect:/productos";
 	}
+	
 	
 	//SE CREA EL METODO GET CON SU RUTA
 	@GetMapping("/edit/{id}")
@@ -88,10 +106,24 @@ public class ProductoController {
 		return "productos/edit";
 	}
 	
+	
 	//SE CREA EL METODO POST CON SU RUTA
 	@PostMapping("/update")
 	//SE CREA EL METODO update SE PASA COMO PARAMETRO EL OBJETO Producto
-	public String update (Producto producto) {
+	public String update (Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
+		Producto p =new Producto();
+		p=productoService.get(producto.getId()).get();
+		
+		if(file.isEmpty()) {//se edita el producto pero no se cambia la imagen
+			
+			producto.setImagen(p.getImagen());
+			
+			//CUANDO SE EDITA LA IMAGEN
+		}else {
+			//Se guarda la nueva imagen subida y se asigna al producto
+			String nombreImagen= upload.saveImage(file);
+			producto.setImagen(nombreImagen);
+		}
 		
 		//SE LLAMA EL METODO update DEFINIDO EN EL ProductoService Y SE LE PASA EL PRODUCTO A MODIFICAR
 		productoService.update(producto);
@@ -100,9 +132,25 @@ public class ProductoController {
 		return"redirect:/productos";
 	}
 	
+	
+	//SE CREA EL METODO GET CON SU RUTA
 	@GetMapping("/delete/{id}")
+	//SE CREA EL METODO DELETE Y SE PASA COMO PARAMETRO EL ID 
 	public String delete(@PathVariable Integer id) {
+		
+		Producto p = new Producto();
+		//productoService.get SE BUSCA EL PRODUCTO POR EL ID PARA ELIMINARLO
+		p=productoService.get(id).get();
+		
+		//Si la imagen actual del producto no es("default.jpg"),se elimina del servidor para evitar archivos innecesarios
+		if(!p.getImagen().equals("default.jpg")) {
+			upload.deleteImage(p.getImagen());
+		}
+		
+		//SE LLAMA EL METODO delete Y SE LE PASA COMO PARAMETRO EL id A ELIMINAR
 		productoService.delete(id);
+		
+		//DESPUES DE ELIMINAR EL REGISTRO SE REDIRECCIONA HACIA LA RUTA productos
 		return "redirect:/productos";
 	}
 	
