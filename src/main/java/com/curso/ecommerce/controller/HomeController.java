@@ -1,5 +1,7 @@
 package com.curso.ecommerce.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.curso.ecommerce.model.DetalleOrden;
+import com.curso.ecommerce.model.Orden;
 import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.service.ProductoService;
 
@@ -24,10 +29,17 @@ public class HomeController {
 	@Autowired
 	private ProductoService productoService;
 	
+	//ITEMS DEL CARRITO (AGREGADOS O QUITADOS POR EL USUARIO)
+	List<DetalleOrden> detalles = new ArrayList<DetalleOrden>();
+	
+	//SON LOS DATOS DE LA ORDEN
+	Orden orden = new Orden();
+	
 	@GetMapping("")
+	//MODEL TRAERA TODOS LOS DATOS DE LA BASE DE DATOS Y LA MOSTRARA EN EL FORMULARIO
 	public String home(Model model) {
 		
-		//EL METODO TRAERA TODOS LOS PRODUCTOS DE LA BASE DE DATOS Y LOS PONDRA EN LA VARIABLE productos
+		//findAll ES EL METODO QUE TRAERA TODOS LOS PRODUCTOS DE LA BASE DE DATOS Y LOS PONDRA EN LA VARIABLE productos
 		model.addAttribute("productos", productoService.findAll());
 		
 		return "usuario/home";
@@ -51,8 +63,14 @@ public class HomeController {
 	
 	//SE CREA UN METODO POST CON SU RUTA 
 	@PostMapping("/cart")
-	public String addCart() {
+	public String addCart(@RequestParam Integer id, @RequestParam Integer cantidad) {
+		DetalleOrden detalleOrden = new DetalleOrden();
+		Producto producto = new Producto();
+		double sumaTotal = 0;
 		
+		Optional<Producto>optionalProducto = productoService.get(id);
+		log.info("Prooducto añadido: {}", optionalProducto.get());
+		log.info("cantidad: {}", cantidad);
 		//RETORNARA LA PAGINA DE CARRITO
 		return "usuario/carrito";
 	}
