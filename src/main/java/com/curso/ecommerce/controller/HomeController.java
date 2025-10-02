@@ -63,14 +63,44 @@ public class HomeController {
 	
 	//SE CREA UN METODO POST CON SU RUTA 
 	@PostMapping("/cart")
-	public String addCart(@RequestParam Integer id, @RequestParam Integer cantidad) {
+	//REQUEST ID Y CANTIDAD: RECIBE EL ID Y LA CANTIDAD DEL PRODUCTO SELECCIONADO POR EL USUARIO
+	public String addCart(@RequestParam Integer id, @RequestParam Integer cantidad, Model model) {
+		
 		DetalleOrden detalleOrden = new DetalleOrden();
 		Producto producto = new Producto();
 		double sumaTotal = 0;
 		
+		//USA EL METODO GET PARA BUSCAR UN PRODUCTO POR SU ID 
 		Optional<Producto>optionalProducto = productoService.get(id);
 		log.info("Prooducto añadido: {}", optionalProducto.get());
 		log.info("cantidad: {}", cantidad);
+		producto=optionalProducto.get();
+		
+		//CON GETTER OBTIENE EL VALOR Y SETTER PERMITE ACTUALIZAR LOS VALORES 
+		detalleOrden.setCantidad(cantidad);
+		detalleOrden.setPrecio(producto.getPrecio());
+		detalleOrden.setNombre(producto.getNombre());
+		//SE REALIZA LA OPERACION PARA OBTENER EL TOTAL Y SE LE ASIGNA A SETTOTAL
+		detalleOrden.setTotal(producto.getPrecio()*cantidad);
+		//MUESTRA TODOS LOS DATOS DEL PRODUCTO
+		detalleOrden.setProducto(producto);
+		
+		//AGREGA LOS VALORES PRECIO,NOMBRE Y PRODUCTO A LA VARIABLE DETALLES
+		detalles.add(detalleOrden);
+		
+		//CONVIERTE LA LISTA DETALLES EN UN STREAM, TOMA DE CADA DETALLE ORDEN SU TOTAL, SUMA TODO ESOS TOTALES 
+		//Y GUARDA EL RESULTADO EN SUMATOTAL
+		sumaTotal=detalles.stream().mapToDouble(dt->dt.getTotal()).sum();
+		
+		//ASIGNA LA SUMATOTAL A SETTOTAL DE ORDEN
+		orden.setTotal(sumaTotal);
+		
+		//SE ENCARGARA DE MOSTRAR TODOS LOS DATOS DE LA LISTA DETALLES EN LA VISTA CART
+		model.addAttribute("cart", detalles);
+		//SE ENCARGARA DE MOSTRAR TODOS LOS DATOS DE LA ORDEN EN LA VISTA ORDEN
+		model.addAttribute("orden",orden);
+		
+		
 		//RETORNARA LA PAGINA DE CARRITO
 		return "usuario/carrito";
 	}
