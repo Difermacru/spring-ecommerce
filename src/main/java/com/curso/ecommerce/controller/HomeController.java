@@ -103,6 +103,41 @@ public class HomeController {
 		
 		//RETORNARA LA PAGINA DE CARRITO
 		return "usuario/carrito";
+			
 	}
-
+	
+	//QUITAR UN PRODUCTO DEL CARRITO
+	//SE LLAMA AL METODO GET Y RECIBIRA COMO PARAMETRO UN ID
+	@GetMapping("/delete/cart/{id}")
+	//SE CREA EL METODO DELETE CON EL PARAMETRO ID Y EL METODO MODEL QUE MOSTRARA LOS DATOS A ELIMINAR EN EL FORMULARIO
+	public String deleteProductoCart(@PathVariable Integer id, Model model) {
+		
+	
+		List<DetalleOrden>ordenesNueva= new ArrayList<DetalleOrden>();
+		
+		//FILTRA EL CARRITO(lista detalles) DEJANDO SOLO LOS ITEMS CUYO PRODUCTO NO TENGAN EL ID RECIBIDO
+		for(DetalleOrden detalleOrden : detalles) {
+			if(detalleOrden.getProducto().getId() != id) {
+				
+				//LOS PRODUCTOS QUE QUEDAN EN detalles PASAN A LA NUEVA LISTA ordenesNuevas
+				ordenesNueva.add(detalleOrden);
+			}
+		}
+		
+		//SE REEMPLAZA LA LISTA detalles POR ordenesNueva
+		detalles = ordenesNueva;
+		
+		//SE RECALCULA EL TOTAL 
+		double sumaTotal = 0;
+		sumaTotal = detalles.stream().mapToDouble(dt -> dt.getTotal()).sum();
+		
+		//PASA LOS DATOS A LA VISTA 
+		orden.setTotal(sumaTotal);
+		model.addAttribute("cart", detalles);
+		model.addAttribute("orden", orden);
+		
+		//Y MUESTRA LA PAGINA DEL CARRITO
+		return "usuario/carrito";
+	}
+	
 }
