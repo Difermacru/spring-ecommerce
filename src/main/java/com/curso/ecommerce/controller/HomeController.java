@@ -85,8 +85,18 @@ public class HomeController {
 		//MUESTRA TODOS LOS DATOS DEL PRODUCTO
 		detalleOrden.setProducto(producto);
 		
-		//AGREGA LOS VALORES PRECIO,NOMBRE Y PRODUCTO A LA VARIABLE DETALLES
-		detalles.add(detalleOrden);
+		//VALIDAR QUE EL PRODUCTO NO SE AGREGUE DOS VECES
+		// id del producto que se intenta agregar
+		Integer idProducto = producto.getId();
+		
+//detalles.stream()recorre la lista detalles      //anyMatch(...): devuelve true si existe al menos un DetalleOrden cuyo producto.id coincide con idProducto
+		boolean ingresado = detalles.stream().anyMatch(p->p.getProducto().getId()==idProducto);
+		
+		// si no está, lo agrega a detalleOrden
+		if(!ingresado) {
+			//AGREGA LOS VALORES PRECIO,NOMBRE Y PRODUCTO A LA VARIABLE DETALLES
+			detalles.add(detalleOrden);
+		}
 		
 		//CONVIERTE LA LISTA DETALLES EN UN STREAM, TOMA DE CADA DETALLE ORDEN SU TOTAL, SUMA TODO ESOS TOTALES 
 		//Y GUARDA EL RESULTADO EN SUMATOTAL
@@ -140,4 +150,11 @@ public class HomeController {
 		return "usuario/carrito";
 	}
 	
+	@GetMapping("/getCart")
+	public String getCart(Model model) {
+		
+		model.addAttribute("cart", detalles);
+		model.addAttribute("orden", orden);
+		return "/usuario/carrito";
+	}
 }
