@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.curso.ecommerce.model.Producto;
-import com.curso.ecommerce.repository.ProductoRepository;
+import com.curso.ecommerce.repository.IProductoRepository;
 
 //3.SE IMPLEMENTAN LOS METODOS QUE SE CREARON EN ProductoService
 @Service
@@ -15,7 +15,7 @@ public class ProductoServiceImpl implements ProductoService{
 	
 	//se usa para poder usar los metodos de JpaRepository que se invocaron en la interfaz ProductoRepository
 	@Autowired
-	private ProductoRepository productoRepository;
+	private IProductoRepository productoRepository;
 
 	@Override
 	public Producto save(Producto producto) {

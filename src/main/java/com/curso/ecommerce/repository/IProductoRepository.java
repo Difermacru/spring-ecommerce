@@ -7,6 +7,6 @@ import com.curso.ecommerce.model.Producto;
 //1.LLAMAMOS LOS METODOS DE JpaRepository, E INDICAMOS A QUIEN PERTENECE,
 @Repository
 //se implementaran los metodos de JpaRepository a la clase Producto e integer es el tipo de dato del id
-public interface ProductoRepository extends JpaRepository<Producto, Integer> {
+public interface IProductoRepository extends JpaRepository<Producto, Integer> {
 
 }
