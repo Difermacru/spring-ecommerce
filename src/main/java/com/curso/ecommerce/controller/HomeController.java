@@ -1,9 +1,10 @@
 package com.curso.ecommerce.controller;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,19 +189,33 @@ public class HomeController {
 	//guardar la orden
 	@GetMapping("/saveOrder")
 	public String saveOrder() {
-		Date fechaCreacion = new Date(0);
+		
+		//Toma la fecha y hora actual del sistema.
+		Date fechaCreacion = new Date();
+		
+		//Guarda la marca de tiempo en la entidad orden.
 		orden.setFechaCreacion(fechaCreacion);
+		
+		//Pide al servicio el número correlativo para la orden (usual con ceros a la izquierda).
 		orden.setNumero(ordenService.generarNumeroOrden());
 		
 		//usuario
 		Usuario usuario = usuarioService.findById(1).get();
 		
+		//Asocia la orden al usuario.
 		orden.setUsuario(usuario);
+		
+		//Toma este objeto orden, conviértelo en una fila y guárdalo físicamente en la tabla orden
 		ordenService.save(orden);
 		
 		//guardar detalles
+		//Recorre la lista detalles (cada elemento es un DetalleOrden).
 		for (DetalleOrden dt:detalles) {
+			
+			//le pone a cada detalle la referencia a la orden “padre”, Esto llena la FK (orden_id) cuando se guarde en la BD.
 			dt.setOrden(orden);
+			
+			//guarda cada detalle en la base de datos (inserta una fila en la tabla de detalles con su orden_id).
 			detalleOrdenService.save(dt);
 		}
 		
@@ -208,7 +223,14 @@ public class HomeController {
 		orden = new Orden();
 		detalles.clear();
 		
-		return "redirect:/";
-		
+		return "redirect:/";	
+	}
+	
+	@PostMapping("/search")
+	public String searchProduct(@RequestParam String nombre, Model model){
+		log.info("Nombre del producto: {}", nombre);
+		List<Producto> productos = productoService.findAll().stream().filter(p->p.getNombre().contains(nombre)).collect(Collectors.toList());
+		model.addAttribute("productos", productos);
+		return "usuario/home";
 	}
 }
