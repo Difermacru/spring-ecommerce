@@ -54,12 +54,17 @@ public class HomeController {
 	
 	@GetMapping("")
 	//MODEL TRAERA TODOS LOS DATOS DE LA BASE DE DATOS Y LA MOSTRARA EN EL FORMULARIO
+	//HttpSession session: acceso a la sesión del usuario (guardar/leer atributos entre requests).
 	public String home(Model model, HttpSession session) {
 		
 		log.info("Sesion del usuario: {}", session.getAttribute("idusuario"));
 		
 		//findAll ES EL METODO QUE TRAERA TODOS LOS PRODUCTOS DE LA BASE DE DATOS Y LOS PONDRA EN LA VARIABLE productos
 		model.addAttribute("productos", productoService.findAll());
+		
+		//session
+		//Lee de la sesión el atributo llamado "idusuario", y Guarda ese valor en el modelo con la clave "session".
+		model.addAttribute("sesion", session.getAttribute("idusuario"));
 		
 		return "usuario/home";
 	}
@@ -170,10 +175,13 @@ public class HomeController {
 	}
 	
 	@GetMapping("/getCart")
-	public String getCart(Model model) {
+	public String getCart(Model model, HttpSession session) {
 		
 		model.addAttribute("cart", detalles);
 		model.addAttribute("orden", orden);
+		
+		//session
+		model.addAttribute("sesion", session.getAttribute("idusuario"));
 		return "/usuario/carrito";
 	}
 	
@@ -186,6 +194,8 @@ public class HomeController {
 		model.addAttribute("orden", orden);
 		model.addAttribute("usuario", usuario);
 		
+		//sesion
+		model.addAttribute("sesion", session.getAttribute("idusuario"));
 		return "usuario/resumenorden";
 		
 	}
