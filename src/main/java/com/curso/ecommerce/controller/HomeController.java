@@ -26,6 +26,8 @@ import com.curso.ecommerce.service.IOrdenService;
 import com.curso.ecommerce.service.IUsuarioService;
 import com.curso.ecommerce.service.ProductoService;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/")
 public class HomeController {
@@ -52,7 +54,9 @@ public class HomeController {
 	
 	@GetMapping("")
 	//MODEL TRAERA TODOS LOS DATOS DE LA BASE DE DATOS Y LA MOSTRARA EN EL FORMULARIO
-	public String home(Model model) {
+	public String home(Model model, HttpSession session) {
+		
+		log.info("Sesion del usuario: {}", session.getAttribute("idusuario"));
 		
 		//findAll ES EL METODO QUE TRAERA TODOS LOS PRODUCTOS DE LA BASE DE DATOS Y LOS PONDRA EN LA VARIABLE productos
 		model.addAttribute("productos", productoService.findAll());
@@ -174,9 +178,9 @@ public class HomeController {
 	}
 	
 	@GetMapping("/order")
-	public String order(Model model) {
+	public String order(Model model, HttpSession session) {
 		
-		Usuario usuario = usuarioService.findById(1).get();
+		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
 		
 		model.addAttribute("cart", detalles);
 		model.addAttribute("orden", orden);
@@ -188,7 +192,7 @@ public class HomeController {
 	
 	//guardar la orden
 	@GetMapping("/saveOrder")
-	public String saveOrder() {
+	public String saveOrder(HttpSession session) {
 		
 		//Toma la fecha y hora actual del sistema.
 		Date fechaCreacion = new Date();
@@ -200,7 +204,7 @@ public class HomeController {
 		orden.setNumero(ordenService.generarNumeroOrden());
 		
 		//usuario
-		Usuario usuario = usuarioService.findById(1).get();
+		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
 		
 		//Asocia la orden al usuario.
 		orden.setUsuario(usuario);

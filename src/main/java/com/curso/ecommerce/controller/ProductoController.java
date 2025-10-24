@@ -17,8 +17,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.curso.ecommerce.model.Producto;
 import com.curso.ecommerce.model.Usuario;
+import com.curso.ecommerce.service.IUsuarioService;
 import com.curso.ecommerce.service.ProductoService;
 import com.curso.ecommerce.service.UploadFileService;
+
+import jakarta.servlet.http.HttpSession;
 
 //4.SE CREA EL ProductoController Y SE IMPLEMENTAN LOS METODOS
 @Controller
@@ -35,6 +38,8 @@ public class ProductoController {
 	@Autowired
 	private UploadFileService upload;
 	
+	@Autowired
+	private IUsuarioService usuarioService;
 	
 	//SE CREA EL METODO GET
 	@GetMapping("")
@@ -58,13 +63,14 @@ public class ProductoController {
 	//SE CREA EL METODO POST CON SU RUTA
 	@PostMapping("/save")
 	//SE CREA EL METODO SAVE Y SE PASARA UN OBJETO DE CLASE Producto COMO PARAMETRO
-	public String save(Producto producto, @RequestParam("img") MultipartFile file) throws IOException {
+	public String save(Producto producto, @RequestParam("img") MultipartFile file, HttpSession session) throws IOException {
 		
 		LOGGER.info("este es el objeto producto {}",producto);
-		//SE CREA UN NUEVO OBJETO DE TIPO USUARIO, ES EL USUARIO QUE SE ASOCIARA AL PRODUCTO
-		Usuario u= new Usuario(1, "", "", "", "", "", "", "");
 		
-		//SE RELACIONA EL producto CON EL Usuario (u), DE ESTA MANERA QUED VINCULADO A UN Usuario 
+		//SE CREA UN NUEVO OBJETO DE TIPO USUARIO, ES EL USUARIO QUE SE ASOCIARA AL PRODUCTO
+		Usuario u= usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
+		
+		//SE RELACIONA EL producto CON EL Usuario (u), DE ESTA MANERA QUEDa VINCULADO A UN Usuario 
 		producto.setUsuario(u);
 		
 		//PARA AGREGAR IMAGENES
