@@ -22,7 +22,7 @@ public class DetalleOrden {
 	
 	//se relaciona la clase DetalleOrden con la clase Orden
 	//y tndra una relacion de uno a uno
-	@OneToOne
+	@ManyToOne
 	private Orden orden;
 	
 	//la clase DetalleOrden se relacionara con la clase Producto

@@ -1,5 +1,6 @@
 package com.curso.ecommerce.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.curso.ecommerce.model.Orden;
 import com.curso.ecommerce.model.Usuario;
+import com.curso.ecommerce.service.IOrdenService;
 import com.curso.ecommerce.service.IUsuarioService;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,6 +27,9 @@ public class UsuarioController {
 	
 	@Autowired
 	private IUsuarioService usuarioService;
+	
+	@Autowired
+	private IOrdenService ordenService;
 	
 	@GetMapping("/registro")
 	public String create(){
@@ -82,8 +88,22 @@ public class UsuarioController {
 	}
 	
 	@GetMapping("/compras")
+	//Model model: objeto que se usa para enviar datos a la vista (al HTML).
+	//HttpSession session: te permite acceder a la sesión del usuario (datos guardados entre peticiones, como idusuario).
 	public String obtenerComprar(Model model, HttpSession session) {
+		
+		//Lees de la sesión el atributo llamado "idusuario". Lo agregas al model con el nombre "session".
+		//Eso hace que en la vista (por ejemplo en Thymeleaf) puedas acceder a ese valor con ${session}.
 		model.addAttribute("session", session.getAttribute("idusuario"));
+		session.getAttribute("idusuario");
+
+//Llamas al servicio para buscar en la base de datos el usuario con ese id.//Obtiene de la sesión el valor guardado bajo la clave "idusuario" (normalmente el id del usuario logueado).
+		Usuario usuario = usuarioService.findById(Integer.parseInt(session.getAttribute("idusuario").toString())).get();
+//Llamas al servicio de órdenes. usa el repositorio (Spring Data) para buscar todas las órdenes que pertenecen a ese Usuario.
+		List<Orden> ordenes = ordenService.findByUsuario(usuario);
+		
+		model.addAttribute("ordenes",ordenes);
+		
 		return "usuario/compras";
 	}
 }

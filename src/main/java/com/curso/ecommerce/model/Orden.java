@@ -1,12 +1,14 @@
 package com.curso.ecommerce.model;
 
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -30,8 +32,8 @@ public class Orden {
 	
 	//se relaciona la clase orden con la clase DetalleOrden
 	//y tendra una relacion de uno a uno
-	@OneToOne(mappedBy = "orden")
-	private DetalleOrden detalle;
+	@OneToMany(mappedBy = "orden")
+	private List<DetalleOrden> detalle;
 	
 	//creacion de constructor sin parametros
 	public Orden() {
@@ -98,11 +100,11 @@ public class Orden {
 		this.usuario = usuario;
 	}
 
-	public DetalleOrden getDetalle() {
+	public List<DetalleOrden> getDetalle() {
 		return detalle;
 	}
 
-	public void setDetalle(DetalleOrden detalle) {
+	public void setDetalle(List<DetalleOrden> detalle) {
 		this.detalle = detalle;
 	}
 

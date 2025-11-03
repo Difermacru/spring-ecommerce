@@ -11,7 +11,9 @@
 <body>
 
   <!-- Header (fuera de tu contenido) -->
-  <div th:replace="usuario/template_usuario :: header"></div>
+  <div th:include="usuario/template_usuario.html::header" th:if="${sesion==null}"></div>
+    
+  <div th:include="usuario/template_usuario.html::header-user" th:unless="${sesion==null}"></div>
 
   <!-- TU CONTENIDO AQUÍ (ya NO dentro del header) -->
   <div class="container">
